@@ -450,6 +450,12 @@ class Wbcom_WC_Subscription_Content_Protection {
         // Get available subscription products
         $subscription_products = $this->wbcom_get_subscription_products();
         
+        // Debug information for admins
+        $debug_info = '';
+        if (current_user_can('manage_options') && defined('WP_DEBUG') && WP_DEBUG) {
+            $debug_info = $this->wbcom_get_debug_info();
+        }
+        
         ?>
         <div class="wbcom-protection-field">
             <label>
@@ -469,10 +475,33 @@ class Wbcom_WC_Subscription_Content_Protection {
                                    value="<?php echo esc_attr($product->get_id()); ?>"
                                    <?php checked(in_array($product->get_id(), (array)$required_products)); ?>>
                             <?php echo esc_html($product->get_name()); ?>
+                            <small style="color: #666; font-style: italic;">
+                                (ID: <?php echo $product->get_id(); ?>, Type: <?php echo $product->get_type(); ?>)
+                            </small>
                         </label>
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <p>No subscription products found. <a href="<?php echo admin_url('post-new.php?post_type=product'); ?>">Create subscription products</a></p>
+                    <div style="padding: 10px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px; margin: 5px 0;">
+                        <p style="margin: 0; color: #856404;">
+                            <strong>No subscription products found.</strong>
+                        </p>
+                        <p style="margin: 5px 0 0 0; font-size: 12px; color: #856404;">
+                            Make sure you have:
+                        </p>
+                        <ul style="margin: 5px 0; padding-left: 20px; font-size: 12px; color: #856404;">
+                            <li>WooCommerce Subscriptions plugin activated</li>
+                            <li>Created products with "Subscription" type</li>
+                            <li>Published subscription products</li>
+                        </ul>
+                        <p style="margin: 5px 0 0 0;">
+                            <a href="<?php echo admin_url('post-new.php?post_type=product'); ?>" class="button button-small">
+                                Create Subscription Product
+                            </a>
+                            <a href="<?php echo admin_url('edit.php?post_type=product'); ?>" class="button button-small">
+                                View All Products
+                            </a>
+                        </p>
+                    </div>
                 <?php endif; ?>
             </div>
         </div>
@@ -482,7 +511,77 @@ class Wbcom_WC_Subscription_Content_Protection {
             <textarea name="wbcom_subscription_custom_message" placeholder="Custom message to show when content is protected..."><?php echo esc_textarea($custom_message); ?></textarea>
             <small>Leave empty to use default message.</small>
         </div>
+        
+        <?php if (!empty($debug_info)): ?>
+            <div class="wbcom-protection-field">
+                <details style="margin-top: 15px;">
+                    <summary style="cursor: pointer; font-weight: bold; color: #666;">
+                        Debug Information (Admin Only)
+                    </summary>
+                    <div style="background: #f5f5f5; padding: 10px; margin-top: 5px; border-radius: 4px; font-family: monospace; font-size: 11px;">
+                        <?php echo $debug_info; ?>
+                    </div>
+                </details>
+            </div>
+        <?php endif; ?>
         <?php
+    }
+    
+    /**
+     * Get debug information for troubleshooting
+     */
+    private function wbcom_get_debug_info() {
+        $debug = array();
+        
+        // Check WooCommerce
+        $debug[] = 'WooCommerce Active: ' . (class_exists('WooCommerce') ? 'Yes' : 'No');
+        
+        // Check WooCommerce Subscriptions
+        $debug[] = 'WC Subscriptions Active: ' . (class_exists('WC_Subscriptions') ? 'Yes' : 'No');
+        
+        // Check for subscription functions
+        $debug[] = 'wcs_is_subscription_product function: ' . (function_exists('wcs_is_subscription_product') ? 'Yes' : 'No');
+        $debug[] = 'wcs_get_subscription_products function: ' . (function_exists('wcs_get_subscription_products') ? 'Yes' : 'No');
+        
+        // Count all products
+        $all_products = get_posts(array(
+            'post_type' => 'product',
+            'posts_per_page' => -1,
+            'post_status' => 'publish',
+            'fields' => 'ids'
+        ));
+        $debug[] = 'Total Published Products: ' . count($all_products);
+        
+        // Check for subscription products with different methods
+        $subscription_products = $this->wbcom_get_subscription_products();
+        $debug[] = 'Found Subscription Products: ' . count($subscription_products);
+        
+        // List first few subscription products
+        if (!empty($subscription_products)) {
+            $debug[] = 'Sample Subscription Products:';
+            $count = 0;
+            foreach ($subscription_products as $product) {
+                if ($count >= 3) break;
+                $debug[] = '  - ' . $product->get_name() . ' (ID: ' . $product->get_id() . ', Type: ' . $product->get_type() . ')';
+                $count++;
+            }
+        }
+        
+        // Check for products with subscription meta
+        $products_with_sub_meta = get_posts(array(
+            'post_type' => 'product',
+            'posts_per_page' => -1,
+            'meta_query' => array(
+                array(
+                    'key' => '_subscription_price',
+                    'compare' => 'EXISTS'
+                )
+            ),
+            'fields' => 'ids'
+        ));
+        $debug[] = 'Products with _subscription_price meta: ' . count($products_with_sub_meta);
+        
+        return implode('<br>', $debug);
     }
     
     /**
@@ -615,30 +714,121 @@ class Wbcom_WC_Subscription_Content_Protection {
      * Get subscription products
      */
     private function wbcom_get_subscription_products() {
+        $products = array();
+        
+        // Method 1: Get all products and filter by subscription type
         $args = array(
             'post_type' => 'product',
             'posts_per_page' => -1,
-            'meta_query' => array(
-                array(
-                    'key' => '_subscription_type',
-                    'value' => array('subscription', 'variable-subscription'),
-                    'compare' => 'IN'
-                )
-            )
+            'post_status' => 'publish',
+            'fields' => 'ids'
         );
         
-        $products = array();
-        $query = new WP_Query($args);
+        $product_ids = get_posts($args);
         
-        if ($query->have_posts()) {
-            while ($query->have_posts()) {
-                $query->the_post();
-                $products[] = wc_get_product(get_the_ID());
+        if (!empty($product_ids)) {
+            foreach ($product_ids as $product_id) {
+                $product = wc_get_product($product_id);
+                
+                if (!$product) {
+                    continue;
+                }
+                
+                // Check if it's a subscription product
+                if ($this->wbcom_is_subscription_product($product)) {
+                    $products[] = $product;
+                }
             }
-            wp_reset_postdata();
+        }
+        
+        // Method 2: Fallback - try direct meta query if Method 1 fails
+        if (empty($products)) {
+            $args = array(
+                'post_type' => 'product',
+                'posts_per_page' => -1,
+                'post_status' => 'publish',
+                'meta_query' => array(
+                    'relation' => 'OR',
+                    array(
+                        'key' => '_subscription_type',
+                        'value' => 'subscription',
+                        'compare' => '='
+                    ),
+                    array(
+                        'key' => '_subscription_type',
+                        'value' => 'variable-subscription',
+                        'compare' => '='
+                    )
+                )
+            );
+            
+            $query = new WP_Query($args);
+            
+            if ($query->have_posts()) {
+                while ($query->have_posts()) {
+                    $query->the_post();
+                    $product = wc_get_product(get_the_ID());
+                    if ($product) {
+                        $products[] = $product;
+                    }
+                }
+                wp_reset_postdata();
+            }
+        }
+        
+        // Method 3: Use WooCommerce Subscriptions functions if available
+        if (empty($products) && function_exists('wcs_get_subscription_products')) {
+            $subscription_products = wcs_get_subscription_products();
+            foreach ($subscription_products as $product_id) {
+                $product = wc_get_product($product_id);
+                if ($product) {
+                    $products[] = $product;
+                }
+            }
+        }
+        
+        // Debug information
+        if (current_user_can('manage_options')) {
+            error_log('Wbcom Subscription Protection: Found ' . count($products) . ' subscription products');
         }
         
         return $products;
+    }
+    
+    /**
+     * Check if a product is a subscription product
+     */
+    private function wbcom_is_subscription_product($product) {
+        if (!$product) {
+            return false;
+        }
+        
+        // Check product type
+        $product_type = $product->get_type();
+        
+        // Direct subscription types
+        if (in_array($product_type, array('subscription', 'variable-subscription'))) {
+            return true;
+        }
+        
+        // Check meta fields
+        $subscription_type = get_post_meta($product->get_id(), '_subscription_type', true);
+        if (in_array($subscription_type, array('subscription', 'variable-subscription'))) {
+            return true;
+        }
+        
+        // Check if WooCommerce Subscriptions functions recognize it
+        if (function_exists('wcs_is_subscription_product') && wcs_is_subscription_product($product)) {
+            return true;
+        }
+        
+        // Check for subscription price meta
+        $subscription_price = get_post_meta($product->get_id(), '_subscription_price', true);
+        if (!empty($subscription_price)) {
+            return true;
+        }
+        
+        return false;
     }
     
     /**
