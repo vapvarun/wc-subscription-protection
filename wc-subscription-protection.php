@@ -540,8 +540,7 @@ class Wbcom_WC_Subscription_Content_Protection {
         $debug[] = 'WC Subscriptions Active: ' . (class_exists('WC_Subscriptions') ? 'Yes' : 'No');
         
         // Check for subscription functions
-        $debug[] = 'wcs_is_subscription_product function: ' . (function_exists('wcs_is_subscription_product') ? 'Yes' : 'No');
-        $debug[] = 'wcs_get_subscription_products function: ' . (function_exists('wcs_get_subscription_products') ? 'Yes' : 'No');
+        $debug[] = 'wc_get_products function: ' . (function_exists('wc_get_products') ? 'Yes' : 'No');
         
         // Count all products
         $all_products = get_posts(array(
@@ -552,34 +551,75 @@ class Wbcom_WC_Subscription_Content_Protection {
         ));
         $debug[] = 'Total Published Products: ' . count($all_products);
         
-        // Check for subscription products with different methods
-        $subscription_products = $this->wbcom_get_subscription_products();
-        $debug[] = 'Found Subscription Products: ' . count($subscription_products);
+        // Test Method 1: wc_get_products with subscription types
+        if (function_exists('wc_get_products')) {
+            $wc_subscription_products = wc_get_products(array(
+                'type' => array('subscription', 'variable-subscription'),
+                'limit' => -1,
+                'status' => 'publish'
+            ));
+            $debug[] = 'Method 1 (wc_get_products): ' . count($wc_subscription_products) . ' subscription products';
+        } else {
+            $debug[] = 'Method 1 (wc_get_products): Function not available';
+        }
         
-        // List first few subscription products
+        // Test Method 2: WP_Query with _subscription_period meta
+        $args = array(
+            'post_type'      => 'product',
+            'posts_per_page' => -1,
+            'post_status'    => 'publish',
+            'meta_query'     => array(
+                array(
+                    'key'     => '_subscription_period',
+                    'compare' => 'EXISTS',
+                ),
+            ),
+        );
+        $subscription_query = new WP_Query($args);
+        $debug[] = 'Method 2 (_subscription_period meta): ' . $subscription_query->found_posts . ' products';
+        wp_reset_postdata();
+        
+        // Test Method 3: Check for other subscription meta
+        $args = array(
+            'post_type'      => 'product',
+            'posts_per_page' => -1,
+            'post_status'    => 'publish',
+            'meta_query'     => array(
+                'relation' => 'OR',
+                array(
+                    'key'     => '_subscription_price',
+                    'compare' => 'EXISTS',
+                ),
+                array(
+                    'key'     => '_subscription_period_interval',
+                    'compare' => 'EXISTS',
+                ),
+            ),
+        );
+        $meta_query = new WP_Query($args);
+        $debug[] = 'Method 3 (other subscription meta): ' . $meta_query->found_posts . ' products';
+        wp_reset_postdata();
+        
+        // Final result from our function
+        $subscription_products = $this->wbcom_get_subscription_products();
+        $debug[] = '<strong>Final Result: ' . count($subscription_products) . ' subscription products found</strong>';
+        
+        // List first few subscription products if found
         if (!empty($subscription_products)) {
-            $debug[] = 'Sample Subscription Products:';
+            $debug[] = '<br><strong>Sample Subscription Products:</strong>';
             $count = 0;
             foreach ($subscription_products as $product) {
-                if ($count >= 3) break;
+                if ($count >= 5) {
+                    $debug[] = '  ... and ' . (count($subscription_products) - 5) . ' more';
+                    break;
+                }
+                $subscription_period = get_post_meta($product->get_id(), '_subscription_period', true);
+                $subscription_price = get_post_meta($product->get_id(), '_subscription_price', true);
                 $debug[] = '  - ' . $product->get_name() . ' (ID: ' . $product->get_id() . ', Type: ' . $product->get_type() . ')';
+                $debug[] = '    Period: ' . $subscription_period . ', Price: ' . $subscription_price;
                 $count++;
             }
         }
-        
-        // Check for products with subscription meta
-        $products_with_sub_meta = get_posts(array(
-            'post_type' => 'product',
-            'posts_per_page' => -1,
-            'meta_query' => array(
-                array(
-                    'key' => '_subscription_price',
-                    'compare' => 'EXISTS'
-                )
-            ),
-            'fields' => 'ids'
-        ));
-        $debug[] = 'Products with _subscription_price meta: ' . count($products_with_sub_meta);
         
         return implode('<br>', $debug);
     }
@@ -716,74 +756,79 @@ class Wbcom_WC_Subscription_Content_Protection {
     private function wbcom_get_subscription_products() {
         $products = array();
         
-        // Method 1: Get all products and filter by subscription type
-        $args = array(
-            'post_type' => 'product',
-            'posts_per_page' => -1,
-            'post_status' => 'publish',
-            'fields' => 'ids'
-        );
-        
-        $product_ids = get_posts($args);
-        
-        if (!empty($product_ids)) {
-            foreach ($product_ids as $product_id) {
-                $product = wc_get_product($product_id);
-                
-                if (!$product) {
-                    continue;
-                }
-                
-                // Check if it's a subscription product
-                if ($this->wbcom_is_subscription_product($product)) {
-                    $products[] = $product;
-                }
+        // Method 1: Use wc_get_products() with subscription types (Preferred method)
+        if (function_exists('wc_get_products')) {
+            $subscription_products = wc_get_products(array(
+                'type' => array('subscription', 'variable-subscription'),
+                'limit' => -1,
+                'status' => 'publish'
+            ));
+            
+            if (!empty($subscription_products)) {
+                return $subscription_products;
             }
         }
         
-        // Method 2: Fallback - try direct meta query if Method 1 fails
+        // Method 2: Use WP_Query with _subscription_period meta (Your working method)
+        $args = array(
+            'post_type'      => 'product',
+            'posts_per_page' => -1,
+            'post_status'    => 'publish',
+            'meta_query'     => array(
+                array(
+                    'key'     => '_subscription_period',
+                    'compare' => 'EXISTS',
+                ),
+            ),
+        );
+        
+        $subscription_query = new WP_Query($args);
+        
+        if ($subscription_query->have_posts()) {
+            while ($subscription_query->have_posts()) {
+                $subscription_query->the_post();
+                $product = wc_get_product(get_the_ID());
+                if ($product) {
+                    $products[] = $product;
+                }
+            }
+            wp_reset_postdata();
+        }
+        
+        // Method 3: Fallback - Check for other subscription meta keys
         if (empty($products)) {
             $args = array(
-                'post_type' => 'product',
+                'post_type'      => 'product',
                 'posts_per_page' => -1,
-                'post_status' => 'publish',
-                'meta_query' => array(
+                'post_status'    => 'publish',
+                'meta_query'     => array(
                     'relation' => 'OR',
                     array(
-                        'key' => '_subscription_type',
-                        'value' => 'subscription',
-                        'compare' => '='
+                        'key'     => '_subscription_price',
+                        'compare' => 'EXISTS',
                     ),
                     array(
-                        'key' => '_subscription_type',
-                        'value' => 'variable-subscription',
-                        'compare' => '='
-                    )
-                )
+                        'key'     => '_subscription_period_interval',
+                        'compare' => 'EXISTS',
+                    ),
+                    array(
+                        'key'     => '_subscription_length',
+                        'compare' => 'EXISTS',
+                    ),
+                ),
             );
             
-            $query = new WP_Query($args);
+            $fallback_query = new WP_Query($args);
             
-            if ($query->have_posts()) {
-                while ($query->have_posts()) {
-                    $query->the_post();
+            if ($fallback_query->have_posts()) {
+                while ($fallback_query->have_posts()) {
+                    $fallback_query->the_post();
                     $product = wc_get_product(get_the_ID());
                     if ($product) {
                         $products[] = $product;
                     }
                 }
                 wp_reset_postdata();
-            }
-        }
-        
-        // Method 3: Use WooCommerce Subscriptions functions if available
-        if (empty($products) && function_exists('wcs_get_subscription_products')) {
-            $subscription_products = wcs_get_subscription_products();
-            foreach ($subscription_products as $product_id) {
-                $product = wc_get_product($product_id);
-                if ($product) {
-                    $products[] = $product;
-                }
             }
         }
         
