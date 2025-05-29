@@ -450,12 +450,6 @@ class Wbcom_WC_Subscription_Content_Protection {
         // Get available subscription products
         $subscription_products = $this->wbcom_get_subscription_products();
         
-        // Debug information for admins
-        $debug_info = '';
-        if (current_user_can('manage_options') && defined('WP_DEBUG') && WP_DEBUG) {
-            $debug_info = $this->wbcom_get_debug_info();
-        }
-        
         ?>
         <div class="wbcom-protection-field">
             <label>
@@ -475,9 +469,6 @@ class Wbcom_WC_Subscription_Content_Protection {
                                    value="<?php echo esc_attr($product->get_id()); ?>"
                                    <?php checked(in_array($product->get_id(), (array)$required_products)); ?>>
                             <?php echo esc_html($product->get_name()); ?>
-                            <small style="color: #666; font-style: italic;">
-                                (ID: <?php echo $product->get_id(); ?>, Type: <?php echo $product->get_type(); ?>)
-                            </small>
                         </label>
                     <?php endforeach; ?>
                 <?php else: ?>
@@ -511,19 +502,6 @@ class Wbcom_WC_Subscription_Content_Protection {
             <textarea name="wbcom_subscription_custom_message" placeholder="Custom message to show when content is protected..."><?php echo esc_textarea($custom_message); ?></textarea>
             <small>Leave empty to use default message.</small>
         </div>
-        
-        <?php if (!empty($debug_info)): ?>
-            <div class="wbcom-protection-field">
-                <details style="margin-top: 15px;">
-                    <summary style="cursor: pointer; font-weight: bold; color: #666;">
-                        Debug Information (Admin Only)
-                    </summary>
-                    <div style="background: #f5f5f5; padding: 10px; margin-top: 5px; border-radius: 4px; font-family: monospace; font-size: 11px;">
-                        <?php echo $debug_info; ?>
-                    </div>
-                </details>
-            </div>
-        <?php endif; ?>
         <?php
     }
     
@@ -769,7 +747,7 @@ class Wbcom_WC_Subscription_Content_Protection {
             }
         }
         
-        // Method 2: Use WP_Query with _subscription_period meta (Your working method)
+        // Method 2: Use WP_Query with _subscription_period meta
         $args = array(
             'post_type'      => 'product',
             'posts_per_page' => -1,
@@ -830,11 +808,6 @@ class Wbcom_WC_Subscription_Content_Protection {
                 }
                 wp_reset_postdata();
             }
-        }
-        
-        // Debug information
-        if (current_user_can('manage_options')) {
-            error_log('Wbcom Subscription Protection: Found ' . count($products) . ' subscription products');
         }
         
         return $products;
