@@ -9,6 +9,14 @@
  * Tested up to: 6.4
  * WC requires at least: 3.0
  * WC tested up to: 8.0
+ * Requires PHP: 7.4
+ * License: GPL v2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * Text Domain: wbcom-subscription-protection
+ * Domain Path: /languages
+ * 
+ * WooCommerce HPOS Compatible: Yes
+ * WooCommerce Blocks Compatible: Yes
  */
 
 // Prevent direct access
@@ -39,6 +47,19 @@ class Wbcom_WC_Subscription_Content_Protection {
         
         // Shortcode support
         add_shortcode('wbcom_subscription_protection', array($this, 'wbcom_protection_shortcode'));
+        
+        // WooCommerce HPOS compatibility
+        add_action('before_woocommerce_init', array($this, 'wbcom_declare_compatibility'));
+    }
+    
+    /**
+     * Declare compatibility with WooCommerce features
+     */
+    public function wbcom_declare_compatibility() {
+        if (class_exists('\Automattic\WooCommerce\Utilities\FeaturesUtil')) {
+            \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('custom_order_tables', __FILE__, true);
+            \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('cart_checkout_blocks', __FILE__, true);
+        }
     }
     
     public function wbcom_init() {
