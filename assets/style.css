@@ -1,0 +1,266 @@
+/* Frontend Styles for WooCommerce Subscription Content Protection Plugin */
+
+/* Protection Message Styles */
+.wbcom-subscription-protection-message {
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 30px;
+    text-align: center;
+    margin: 20px 0;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.wbcom-subscription-protection-message .protection-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+    display: block;
+}
+
+.wbcom-subscription-protection-message h3 {
+    color: #495057;
+    margin-bottom: 15px;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.wbcom-subscription-protection-message p {
+    color: #6c757d;
+    margin-bottom: 20px;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.wbcom-subscription-protection-message .required-subscriptions {
+    background: #e9ecef;
+    padding: 15px;
+    border-radius: 4px;
+    margin: 20px 0;
+    text-align: left;
+}
+
+.wbcom-subscription-protection-message .required-subscriptions p {
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #495057;
+}
+
+.wbcom-subscription-protection-message .required-subscriptions ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 10px 0 0 0;
+}
+
+.wbcom-subscription-protection-message .required-subscriptions li {
+    margin-bottom: 8px;
+    padding-left: 20px;
+    position: relative;
+}
+
+.wbcom-subscription-protection-message .required-subscriptions li:before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    color: #007cba;
+    font-weight: bold;
+}
+
+.wbcom-subscription-protection-message .required-subscriptions a {
+    color: #007cba;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.wbcom-subscription-protection-message .required-subscriptions a:hover {
+    text-decoration: underline;
+    color: #005a87;
+}
+
+.wbcom-subscription-protection-message .button {
+    background: #007cba;
+    color: white;
+    padding: 12px 24px;
+    text-decoration: none;
+    border-radius: 6px;
+    display: inline-block;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.wbcom-subscription-protection-message .button:hover {
+    background: #005a87;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 124, 186, 0.3);
+}
+
+/* Widget Styles */
+.wbcom-subscription-widget {
+    padding: 15px 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.wbcom-subscription-widget .protection-status {
+    margin-bottom: 15px;
+}
+
+.wbcom-subscription-widget .status {
+    display: inline-block;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    border: 1px solid;
+}
+
+.wbcom-subscription-widget .status.protected {
+    background: #fff3cd;
+    color: #856404;
+    border-color: #ffeaa7;
+}
+
+.wbcom-subscription-widget .status.unprotected {
+    background: #d1edff;
+    color: #0c5460;
+    border-color: #b8daff;
+}
+
+.wbcom-subscription-widget .required-subs {
+    margin-top: 8px;
+    padding: 5px 0;
+}
+
+.wbcom-subscription-widget .required-subs small {
+    color: #666;
+    font-style: italic;
+    font-size: 12px;
+}
+
+.wbcom-subscription-widget .protection-toggle {
+    margin-top: 15px;
+}
+
+.wbcom-subscription-widget .protection-toggle-form .button {
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 3px;
+    background: #0073aa;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.wbcom-subscription-widget .protection-toggle-form .button:hover {
+    background: #005177;
+}
+
+.wbcom-subscription-widget .protection-toggle-form .button.button-small {
+    font-size: 11px;
+    padding: 4px 8px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .wbcom-subscription-protection-message {
+        margin: 15px 10px;
+        padding: 20px;
+    }
+    
+    .wbcom-subscription-protection-message .protection-icon {
+        font-size: 36px;
+    }
+    
+    .wbcom-subscription-protection-message h3 {
+        font-size: 20px;
+    }
+    
+    .wbcom-subscription-protection-message p {
+        font-size: 14px;
+    }
+    
+    .wbcom-subscription-protection-message .button {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .wbcom-subscription-protection-message {
+        padding: 15px;
+        margin: 10px 5px;
+    }
+    
+    .wbcom-subscription-protection-message .protection-icon {
+        font-size: 30px;
+        margin-bottom: 10px;
+    }
+    
+    .wbcom-subscription-protection-message h3 {
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+    
+    .wbcom-subscription-protection-message .required-subscriptions {
+        padding: 10px;
+        margin: 15px 0;
+    }
+    
+    .wbcom-subscription-protection-message .button {
+        padding: 8px 16px;
+        font-size: 13px;
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* Animation Effects */
+.wbcom-subscription-protection-message {
+    animation: wbcomFadeIn 0.5s ease-in;
+}
+
+@keyframes wbcomFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Focus States for Accessibility */
+.wbcom-subscription-protection-message .button:focus {
+    outline: 2px solid #005177;
+    outline-offset: 2px;
+}
+
+.wbcom-subscription-protection-message .required-subscriptions a:focus {
+    outline: 2px solid #007cba;
+    outline-offset: 1px;
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+    .wbcom-subscription-protection-message {
+        border-width: 3px;
+        border-color: #000;
+    }
+    
+    .wbcom-subscription-protection-message h3 {
+        color: #000;
+    }
+    
+    .wbcom-subscription-protection-message p {
+        color: #000;
+    }
+}

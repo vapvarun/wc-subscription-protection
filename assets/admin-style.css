@@ -1,0 +1,334 @@
+/* Admin Styles for WooCommerce Subscription Content Protection Plugin */
+
+/* Meta Box Styles */
+.wbcom-protection-field { 
+    margin-bottom: 15px;
+    padding: 5px 0;
+}
+
+.wbcom-protection-field label { 
+    display: block; 
+    font-weight: 600; 
+    margin-bottom: 8px;
+    color: #23282d;
+    font-size: 13px;
+}
+
+.wbcom-protection-field input[type="checkbox"] { 
+    margin-right: 8px;
+    margin-top: 1px;
+}
+
+.wbcom-protection-field textarea { 
+    width: 100%; 
+    height: 80px;
+    resize: vertical;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.wbcom-protection-field textarea:focus {
+    border-color: #007cba;
+    box-shadow: 0 0 0 1px #007cba;
+    outline: none;
+}
+
+.wbcom-protection-field small {
+    color: #666;
+    font-style: italic;
+    display: block;
+    margin-top: 5px;
+    font-size: 12px;
+}
+
+/* Products Selection Area */
+.wbcom-protection-products { 
+    max-height: 150px; 
+    overflow-y: auto; 
+    border: 1px solid #ddd; 
+    padding: 10px; 
+    background: #f9f9f9;
+    border-radius: 4px;
+    margin-top: 5px;
+}
+
+.wbcom-protection-products:empty::after {
+    content: "No subscription products available.";
+    color: #666;
+    font-style: italic;
+    display: block;
+    text-align: center;
+    padding: 10px;
+}
+
+.wbcom-protection-products label {
+    font-weight: normal !important;
+    display: block;
+    margin-bottom: 8px;
+    padding: 3px 0;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.wbcom-protection-products label:hover {
+    background-color: rgba(0, 124, 186, 0.05);
+    padding-left: 3px;
+    padding-right: 3px;
+    border-radius: 3px;
+}
+
+.wbcom-protection-products input[type="checkbox"] {
+    margin-right: 8px;
+    margin-top: 2px;
+}
+
+/* Meta Box Header */
+#wbcom_subscription_protection .hndle {
+    background: linear-gradient(135deg, #007cba 0%, #005a87 100%);
+    color: white;
+    border: none;
+}
+
+#wbcom_subscription_protection .handlediv {
+    color: white;
+}
+
+#wbcom_subscription_protection .inside {
+    margin: 0;
+    padding: 15px;
+}
+
+/* Success/Error Messages in Meta Box */
+.wbcom-protection-notice {
+    padding: 8px 12px;
+    margin: 10px 0;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.wbcom-protection-notice.success {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.wbcom-protection-notice.error {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+/* Classic Editor Popup Styles */
+#wbcom-protection-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wbcom-protection-popup-content {
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    min-width: 500px;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.wbcom-protection-popup-content h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #23282d;
+    font-size: 18px;
+    font-weight: 600;
+    border-bottom: 2px solid #007cba;
+    padding-bottom: 10px;
+}
+
+.wbcom-protection-popup-content .wbcom-protection-field {
+    margin-bottom: 20px;
+}
+
+.wbcom-protection-popup-content .wbcom-protection-field label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #23282d;
+    font-size: 14px;
+}
+
+.wbcom-protection-popup-content .wbcom-protection-field textarea {
+    width: 100%;
+    height: 80px;
+    resize: vertical;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.wbcom-protection-popup-content .wbcom-protection-field textarea:focus {
+    border-color: #007cba;
+    box-shadow: 0 0 0 1px #007cba;
+    outline: none;
+}
+
+.wbcom-protection-popup-content .wbcom-protection-products {
+    max-height: 120px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 10px;
+    background: #f9f9f9;
+    border-radius: 4px;
+}
+
+.wbcom-protection-popup-content .wbcom-protection-products label {
+    font-weight: normal !important;
+    display: block;
+    margin-bottom: 6px;
+    cursor: pointer;
+}
+
+.wbcom-protection-buttons {
+    text-align: right;
+    margin-top: 25px;
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+}
+
+.wbcom-protection-buttons .button {
+    margin-left: 10px;
+    padding: 8px 16px;
+    font-size: 13px;
+}
+
+.wbcom-protection-buttons .button-primary {
+    background: #007cba;
+    border-color: #007cba;
+}
+
+.wbcom-protection-buttons .button-primary:hover,
+.wbcom-protection-buttons .button-primary:focus {
+    background: #005a87;
+    border-color: #005a87;
+}
+
+/* Media Button Styling */
+#wbcom-add-protection-button {
+    background: #007cba;
+    border-color: #007cba;
+    color: white;
+    margin-left: 5px;
+    padding: 2px 8px;
+    font-size: 13px;
+}
+
+#wbcom-add-protection-button:hover,
+#wbcom-add-protection-button:focus {
+    background: #005a87;
+    border-color: #005a87;
+    color: white;
+}
+
+/* Loading States */
+.wbcom-protection-loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.wbcom-protection-loading::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #007cba;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: wbcomSpin 1s linear infinite;
+}
+
+@keyframes wbcomSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsive Admin Styles */
+@media (max-width: 782px) {
+    .wbcom-protection-popup-content {
+        min-width: 90%;
+        margin: 20px;
+        padding: 20px;
+    }
+    
+    .wbcom-protection-buttons {
+        text-align: center;
+    }
+    
+    .wbcom-protection-buttons .button {
+        margin: 5px;
+        display: block;
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* Widget Admin Styles */
+.widget .wbcom-protection-field {
+    margin-bottom: 10px;
+}
+
+.widget .wbcom-protection-field label {
+    font-weight: normal;
+    margin-bottom: 5px;
+}
+
+/* High Contrast Support for Admin */
+@media (prefers-contrast: high) {
+    .wbcom-protection-products {
+        border-width: 2px;
+        border-color: #000;
+    }
+    
+    .wbcom-protection-field textarea {
+        border-width: 2px;
+        border-color: #000;
+    }
+    
+    .wbcom-protection-popup-content {
+        border: 2px solid #000;
+    }
+}
+
+/* Focus Management for Accessibility */
+.wbcom-protection-popup-content .wbcom-protection-field input:focus,
+.wbcom-protection-popup-content .wbcom-protection-field textarea:focus {
+    outline: 2px solid #007cba;
+    outline-offset: 1px;
+}
+
+/* Print Styles */
+@media print {
+    #wbcom-protection-popup,
+    .wbcom-protection-buttons {
+        display: none !important;
+    }
+}
